@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "money": 123,
+      "valute": "ru"
+    },
+    {
+      "money": 123,
+      "valute": "eu"
+    },
+    {
+      "money": 123,
+      "valute": "us"
+    }
+  ]
+}
