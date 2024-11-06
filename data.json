@@ -1,4 +1,7 @@
-{
+[{
+  "_id": {
+    "$oid": "672b318adc9a6d4023c17d0c"
+  },
   "data": [
     {
       "money": 123,
@@ -12,5 +15,11 @@
       "money": 123,
       "valute": "us"
     }
+  ],
+  "data_safety": [
+    {
+      "field_one": "blablabla",
+      "field_two": "albalbalb"
+    }
   ]
-}
+}]

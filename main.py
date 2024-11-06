@@ -1,3 +1,6 @@
+import json
+
+from bson import json_util
 from fastapi import FastAPI
 from pymongo import MongoClient
 
@@ -6,8 +9,7 @@ from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 mydb = client["fast-api-project"]
 collection = mydb.get_collection("impotent-data")
-for i in mydb.get_collection("impotent-data").find():
-    print(i)
+
 
 app = FastAPI()
 
@@ -20,3 +22,7 @@ async def root():
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
+@app.get("/data-safety")
+async def data_safety():
+    for i in mydb.get_collection("impotent-data").find():
+        return json.loads(json_util.dumps(i))
