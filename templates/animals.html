@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Animals</h1>
+<a href="/add-animal/" class="btn btn-primary">Add Animal</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Species</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for animal in animals %}
+        <tr data-id="{{ animal._id }}">
+            <td>{{ animal._id }}</td>
+            <td contenteditable="false" class="name">{{ animal.name }}</td>
+            <td contenteditable="false" class="age">{{ animal.age }}</td>
+            <td contenteditable="false" class="species">{{ animal.species }}</td>
+            <td>
+                <button onclick="toggleEdit(this)" class="btn btn-warning">Edit</button>
+                <button onclick="deleteAnimal('{{ animal._id }}')" class="btn btn-danger">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    // Переключает режим редактирования для строки
+    function toggleEdit(button) {
+        const row = button.closest('tr');
+        const isEditing = button.innerText === 'Save';
+
+        // Меняет текст кнопки и атрибуты редактирования
+        button.innerText = isEditing ? 'Edit' : 'Save';
+        button.classList.toggle('btn-warning', isEditing);
+        button.classList.toggle('btn-success', !isEditing);
+
+        const editableFields = row.querySelectorAll('.name, .age, .species');
+        editableFields.forEach(field => {
+            field.contentEditable = !isEditing; // Меняет состояние редактируемости
+            if (isEditing) field.style.backgroundColor = ""; // Сброс цвета при завершении редактирования
+            else field.style.backgroundColor = "#fffdeb"; // Подсвечивает редактируемые поля
+        });
+
+        // Сохранить изменения, если нажата кнопка "Save"
+        if (isEditing) {
+            const updatedData = {
+                name: row.querySelector('.name').innerText,
+                age: parseInt(row.querySelector('.age').innerText),
+                species: row.querySelector('.species').innerText,
+            };
+            saveAnimal(row.getAttribute('data-id'), updatedData);
+        }
+    }
+
+    // Отправляет запрос на обновление данных животного
+    async function saveAnimal(id, data) {
+        try {
+            const response = await fetch(`/update-animal/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) throw new Error('Failed to save animal');
+            alert('Animal updated successfully');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // Отправляет запрос на удаление животного
+    async function deleteAnimal(id) {
+        try {
+            const response = await fetch(`/delete-animal/${id}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Failed to delete animal');
+            window.location.replace("http://localhost:8000/");
+        } catch (error) {
+            console.error(error);
+            window.location.replace("http://localhost:8000/");
+        }
+    }
+</script>
+{% endblock %}
