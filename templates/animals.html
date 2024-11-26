@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Animals</h1>
-<a href="/add-animal/" class="btn btn-primary">Add Animal</a>
+<h1>Животные</h1>
+<a href="/add-animal/" class="btn btn-primary" style="margin-left: 5%">Добавить животное</a>
 
 <table class="table">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Species</th>
-            <th>Actions</th>
+            <th>Имя</th>
+            <th>Возраст</th>
+            <th>Вид</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -22,8 +22,8 @@
             <td contenteditable="false" class="age">{{ animal.age }}</td>
             <td contenteditable="false" class="species">{{ animal.species }}</td>
             <td>
-                <button onclick="toggleEdit(this)" class="btn btn-warning">Edit</button>
-                <button onclick="deleteAnimal('{{ animal._id }}')" class="btn btn-danger">Delete</button>
+                <button onclick="toggleEdit(this)" class="btn btn-warning">Редактировать</button>
+                <button onclick="deleteAnimal('{{ animal._id }}')" class="btn btn-danger">Удалить</button>
             </td>
         </tr>
         {% endfor %}
@@ -31,56 +31,53 @@
 </table>
 
 <script>
-    // Переключает режим редактирования для строки
     function toggleEdit(button) {
         const row = button.closest('tr');
-        const isEditing = button.innerText === 'Save';
+        const isEditing = button.innerText === 'Сохранить';
 
-        // Меняет текст кнопки и атрибуты редактирования
-        button.innerText = isEditing ? 'Edit' : 'Save';
+        button.innerText = isEditing ? 'Редактировать' : 'Сохранить';
+
         button.classList.toggle('btn-warning', isEditing);
         button.classList.toggle('btn-success', !isEditing);
 
         const editableFields = row.querySelectorAll('.name, .age, .species');
         editableFields.forEach(field => {
-            field.contentEditable = !isEditing; // Меняет состояние редактируемости
-            if (isEditing) field.style.backgroundColor = ""; // Сброс цвета при завершении редактирования
-            else field.style.backgroundColor = "#fffdeb"; // Подсвечивает редактируемые поля
+            field.contentEditable = !isEditing;
+            
+            if (isEditing) field.style.backgroundColor = "";
+            else field.style.backgroundColor = "#fffdeb";
         });
 
-        // Сохранить изменения, если нажата кнопка "Save"
         if (isEditing) {
             const updatedData = {
                 name: row.querySelector('.name').innerText,
                 age: parseInt(row.querySelector('.age').innerText),
                 species: row.querySelector('.species').innerText,
             };
+
             saveAnimal(row.getAttribute('data-id'), updatedData);
         }
     }
 
-    // Отправляет запрос на обновление данных животного
     async function saveAnimal(id, data) {
         try {
             const response = await fetch(`/update-animal/${id}`, {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             });
-            if (!response.ok) throw new Error('Failed to save animal');
-            alert('Animal updated successfully');
+            if (!response.ok) throw new Error('Ошибка сохранения');
         } catch (error) {
             console.error(error);
         }
     }
 
-    // Отправляет запрос на удаление животного
     async function deleteAnimal(id) {
         try {
             const response = await fetch(`/delete-animal/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete animal');
+            if (!response.ok) throw new Error('Ошибка удаления');
             window.location.replace("http://localhost:8000/");
         } catch (error) {
             console.error(error);
